@@ -31,3 +31,17 @@ Useful Gradle tasks and flags:
 
 Note that most tasks that are not specific to a single project can be run with `name:` prefix, where the `name` should be replaced with the ID of a specific project.
 For example, `core:clean` removes `build` folder only from the `core` project.
+
+
+
+#Mini Dungeon Crawler 
+A small dungeon-crawler-esque game that helped me practice using UI
+
+#Purpose 
+The game is mostly for practicing. It's also fun to play imo.
+
+Movement for the character can be done with WASD or the Arrow-Keys. 
+ESC brings you to the Pause-Menu, where you can also adjust the Music-Volume.
+
+Authors / Contributors 
+Jessica Kreuzberger
