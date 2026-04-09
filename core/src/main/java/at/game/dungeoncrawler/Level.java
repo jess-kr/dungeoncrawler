@@ -65,7 +65,7 @@ public class Level {
                 int segments = 12;
                 float[] vertices = new float[segments * 2];
 
-                // 2. Zentrum basierend auf den BEREITS skalierten Werten
+           
                 float centerX = x + width / 2f;
                 float centerY = y + height / 2f;
                 float radiusX = width / 2f;
@@ -119,14 +119,13 @@ public class Level {
                     return true;
                 }
             }
-            // 2. RECHTECK GEGEN POLYGON (Hier sind auch deine umgewandelten Ellipsen drin!)
+            // 2. RECHTECK GEGEN POLYGON
             else if (wall instanceof Polygon) {
                 Polygon polyWall = (Polygon) wall;
 
-                // Schneller Vor-Check via BoundingBox
+                
                 if (rect.overlaps(polyWall.getBoundingRectangle())) {
 
-                    // Präziser Check: Wir wandeln das Spieler-Rechteck in ein Polygon um
                     float[] v = playerHelperPoly.getVertices();
                     v[0] = rect.x;
                     v[1] = rect.y;
@@ -137,8 +136,7 @@ public class Level {
                     v[6] = rect.x;
                     v[7] = rect.y + rect.height;
 
-                    playerHelperPoly.setPosition(0, 0); // Wichtig, da Vertices Weltkoordinaten sind
-
+                    playerHelperPoly.setPosition(0, 0); 
                     if (Intersector.overlapConvexPolygons(polyWall, playerHelperPoly)) {
                         return true;
                     }
