@@ -75,9 +75,10 @@ public class GameScreen implements Screen {
     // -------------------------------------------------------------------------
     // Constructor
     // -------------------------------------------------------------------------
-    public GameScreen(Game game, Difficulty difficulty, Player.CharacterType characterType) {
+    public GameScreen(Game game, Difficulty difficulty, Player.CharacterType characterType, AudioManager audio) {
         this.game       = game;
         this.difficulty = difficulty;
+        this.audio      = audio;
         // characterType is applied in show() once textures are loaded
         this.pendingCharacterType = characterType;
     }
@@ -129,8 +130,7 @@ public class GameScreen implements Screen {
             case HARD   -> 2f;
         };
 
-        // Audio
-        audio = new AudioManager();
+        // Audio is passed in from Main — do not create a new one here
 
         // Pause slider geometry
         float sliderWidth = VIRTUAL_W * 0.4f;
@@ -157,9 +157,9 @@ public class GameScreen implements Screen {
         // Input always runs
         input.processGameInput(state, player, projectiles, camera, lastAttackTime, audio);
 
-        // Restart goes back to menu
+        // Restart goes back to Start
         if (state.restartRequested) {
-            game.setScreen(new MenuScreen(game));
+            game.setScreen(new StartScreen(game, audio));
             return;
         }
 
@@ -195,7 +195,7 @@ public class GameScreen implements Screen {
         materialTexture.dispose();
         materialRareTexture.dispose();
         level.dispose();
-        audio.dispose();
+        // audio is owned by Main — do not dispose here
     }
 
     // -------------------------------------------------------------------------
@@ -273,9 +273,14 @@ public class GameScreen implements Screen {
                 continue;
             }
 
-            if (state.score >= state.pointsToWin) {
+            if (state.score >= state.pointsToWin && !state.isWon) {
                 state.isWon = true;
                 state.wins++;
+                // Persist total wins so StartScreen can show them
+                com.badlogic.gdx.Preferences prefs = Gdx.app.getPreferences("dungeon_crawler_prefs");
+                int totalWins = prefs.getInteger("total_wins", 0) + 1;
+                prefs.putInteger("total_wins", totalWins);
+                prefs.flush();
             }
 
             if (mat.bounds.y + mat.bounds.height < BORDER_SIZE) {

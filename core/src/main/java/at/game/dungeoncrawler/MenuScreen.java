@@ -45,9 +45,11 @@ public class MenuScreen implements Screen {
     private Phase phase = Phase.DIFFICULTY;
 
     private GameScreen.Difficulty chosenDifficulty;
+    private final AudioManager audio;
 
-    public MenuScreen(Game game) {
-        this.game = game;
+    public MenuScreen(Game game, AudioManager audio) {
+        this.game  = game;
+        this.audio = audio;
     }
 
     @Override
@@ -124,7 +126,7 @@ public class MenuScreen implements Screen {
         }
 
         if (type != null) {
-            game.setScreen(new GameScreen(game, chosenDifficulty, type));
+            game.setScreen(new GameScreen(game, chosenDifficulty, type, audio));
         }
     }
 
