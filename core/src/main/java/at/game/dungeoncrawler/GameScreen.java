@@ -17,11 +17,7 @@ import com.badlogic.gdx.utils.viewport.Viewport;
 import java.util.ArrayList;
 import java.util.Iterator;
 
-/**
- * The main gameplay screen.
- * All heavy lifting is delegated to AudioManager, SpawnManager,
- * InputHandler, UIRenderer, and GameState.
- */
+
 public class GameScreen implements Screen {
 
     // -------------------------------------------------------------------------
@@ -78,7 +74,6 @@ public class GameScreen implements Screen {
     public GameScreen(Game game, Difficulty difficulty, Player.CharacterType characterType) {
         this.game       = game;
         this.difficulty = difficulty;
-        // characterType is applied in show() once textures are loaded
         this.pendingCharacterType = characterType;
     }
 
