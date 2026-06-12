@@ -22,9 +22,12 @@ import com.badlogic.gdx.math.Shape2D;
 
 import java.util.ArrayList;
 
+
 public class Level {
     private TiledMap map;
     private TiledMapRenderer renderer;
+    private int[] bgLayerIndices;
+    private int[] fgLayerIndices;
     public ArrayList<Shape2D> collisions = new ArrayList<>();
     private final Polygon playerHelperPoly = new Polygon(new float[8]);
     private ShapeRenderer shapeRenderer = new ShapeRenderer();
@@ -37,6 +40,7 @@ public class Level {
         map = new TmxMapLoader().load(tmxPath, params);
         renderer = new OrthogonalTiledMapRenderer(map, SCALE);
         buildCollisions();
+        buildLayerIndices();
     }
 
     private void buildCollisions() {
@@ -65,7 +69,7 @@ public class Level {
                 int segments = 12;
                 float[] vertices = new float[segments * 2];
 
-           
+
                 float centerX = x + width / 2f;
                 float centerY = y + height / 2f;
                 float radiusX = width / 2f;
@@ -89,10 +93,16 @@ public class Level {
         AnimatedTiledMapTile.updateAnimationBaseTime();
     }
 
-    public void render(OrthographicCamera camera) {
+    public void renderBackground(OrthographicCamera camera) {
         renderer.setView(camera);
-        renderer.render();
+        renderer.render(bgLayerIndices);
     }
+
+    public void renderForeground(OrthographicCamera camera) {
+        renderer.setView(camera);
+        renderer.render(fgLayerIndices);
+    }
+
 
     public void dispose() {
         map.dispose();
@@ -111,6 +121,40 @@ public class Level {
         return layer.getHeight() * layer.getTileHeight() * SCALE;
     }
 
+    private void buildLayerIndices() {
+        // Layers that render BEHIND the player
+        String[] bgNames = {
+            "water_floor3",
+            "walls_under_water",
+            "water_detailization2",
+            "Floor2_pool",
+            "water_detailization",
+            "Floor2_darker_surface",
+            "Floor",
+            "Floor_darker_surface",
+            "Objects_under_wall",
+            "Walls",
+            "Windows",
+            "Lights"};
+
+        // Layers that render IN FRONT of the player
+        String[] fgNames = { "Objects", "Objects2" };
+
+        bgLayerIndices = resolveLayerIndices(bgNames);
+        fgLayerIndices = resolveLayerIndices(fgNames);
+    }
+
+    private int[] resolveLayerIndices(String[] names) {
+        int[] result = new int[names.length];
+        int count = 0;
+        for (String name : names) {
+            if (map.getLayers().get(name) != null) {
+                result[count++] = map.getLayers().getIndex(name);
+            }
+        }
+        return java.util.Arrays.copyOf(result, count);
+    }
+
     public boolean overlapsCollision(Rectangle rect) {
         for (Shape2D wall : collisions) {
             // 1. RECHTECK GEGEN RECHTECK
@@ -123,7 +167,7 @@ public class Level {
             else if (wall instanceof Polygon) {
                 Polygon polyWall = (Polygon) wall;
 
-                
+
                 if (rect.overlaps(polyWall.getBoundingRectangle())) {
 
                     float[] v = playerHelperPoly.getVertices();
@@ -136,7 +180,7 @@ public class Level {
                     v[6] = rect.x;
                     v[7] = rect.y + rect.height;
 
-                    playerHelperPoly.setPosition(0, 0); 
+                    playerHelperPoly.setPosition(0, 0);
                     if (Intersector.overlapConvexPolygons(polyWall, playerHelperPoly)) {
                         return true;
                     }

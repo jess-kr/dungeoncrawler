@@ -106,15 +106,15 @@ public class GameScreen implements Screen {
         level = new Level("maps/Dungeon1.tmx");
 
         // Textures
-        playerTexture      = new Texture(Gdx.files.internal("player.png"));
-        adventurerTexture  = new Texture(Gdx.files.internal("adventurer.png"));
-        enemyTexture       = new Texture(Gdx.files.internal("goblin_spritesheet.png"));
-        enemyFastTexture   = new Texture(Gdx.files.internal("slime_spritesheet.png"));
-        enemyTankTexture   = new Texture(Gdx.files.internal("goblin_spritesheet.png"));
-        materialTexture     = new Texture(Gdx.files.internal("blueFlower.png"));
-        materialRareTexture = new Texture(Gdx.files.internal("material_rare.png"));
-        witchProjectile    = new Texture(Gdx.files.internal("laser.png"));
-        adventurerProjectile = new Texture(Gdx.files.internal("arrow.png"));
+        playerTexture      = new Texture(Gdx.files.internal("players/player.png"));
+        adventurerTexture  = new Texture(Gdx.files.internal("players/adventurer.png"));
+        enemyTexture       = new Texture(Gdx.files.internal("enemies/goblin_spritesheet.png"));
+        enemyFastTexture   = new Texture(Gdx.files.internal("enemies/slime_spritesheet.png"));
+        enemyTankTexture   = new Texture(Gdx.files.internal("enemies/goblin_spritesheet.png"));
+        materialTexture     = new Texture(Gdx.files.internal("materials/blueFlower.png"));
+        materialRareTexture = new Texture(Gdx.files.internal("materials/material_rare.png"));
+        witchProjectile    = new Texture(Gdx.files.internal("players/laser.png"));
+        adventurerProjectile = new Texture(Gdx.files.internal("players/arrow.png"));
 
         // Game state
         state = new GameState();
@@ -130,7 +130,7 @@ public class GameScreen implements Screen {
             case HARD   -> 2f;
         };
 
-        // Audio is passed in from Main — do not create a new one here
+        // Audio is passed in from Main
 
         // Pause slider geometry
         float sliderWidth = VIRTUAL_W * 0.4f;
@@ -164,7 +164,7 @@ public class GameScreen implements Screen {
         }
 
         // Update only when playing
-        if (!state.isPaused && !state.isWon && !state.isGameOver) {
+        if (running()) {
             update(delta);
         }
 
@@ -195,7 +195,7 @@ public class GameScreen implements Screen {
         materialTexture.dispose();
         materialRareTexture.dispose();
         level.dispose();
-        // audio is owned by Main — do not dispose here
+        // audio is owned by Main, no need to dispose here
     }
 
     // -------------------------------------------------------------------------
@@ -221,8 +221,8 @@ public class GameScreen implements Screen {
 
         float halfW = viewport.getWorldWidth()  / 2f;
         float halfH = viewport.getWorldHeight() / 2f;
-        camera.position.x = java.lang.Math.max(halfW, java.lang.Math.min(camera.position.x, level.getMapWidth()  - halfW));
-        camera.position.y = java.lang.Math.max(halfH, java.lang.Math.min(camera.position.y, level.getMapHeight() - halfH));
+        camera.position.x = Math.clamp(camera.position.x, halfW, level.getMapWidth() - halfW);
+        camera.position.y = Math.clamp(camera.position.y, halfH, level.getMapHeight() - halfH);
 
         camera.update();
     }
@@ -291,7 +291,8 @@ public class GameScreen implements Screen {
 
     private void updateProjectiles() {
         Iterator<Projectile> iter = projectiles.iterator();
-        while (iter.hasNext()) {
+
+        while (iter.hasNext() && running()) {
             Projectile p = iter.next();
             p.x += p.dx * p.speed * Gdx.graphics.getDeltaTime();
             p.y += p.dy * p.speed * Gdx.graphics.getDeltaTime();
@@ -329,7 +330,7 @@ public class GameScreen implements Screen {
         viewport.apply();
 
         // World-space rendering
-        level.render(camera);
+        level.renderBackground(camera);
 
         batch.setProjectionMatrix(camera.combined);
         batch.begin();
@@ -338,6 +339,8 @@ public class GameScreen implements Screen {
         for (Material m : materials) batch.draw(m.texture, m.bounds.x, m.bounds.y, m.bounds.width, m.bounds.height);
         drawProjectiles();
         batch.end();
+
+        level.renderForeground(camera);
 
         // Screen-space HUD
         ui.drawHUD(state, player);
@@ -388,10 +391,14 @@ public class GameScreen implements Screen {
         player = new Player(1600, 1100, 40, 40, startSpeed, startLives, tex, type, level);
 
         Texture sheetTex = new Texture(Gdx.files.internal(
-                type == Player.CharacterType.WITCH ? "witch-Sheet.png" : "adventurer-Sheet.png"));
+                type == Player.CharacterType.WITCH ? "players/witch-Sheet.png" : "players/adventurer-Sheet.png"));
         player.setProjectileTexture(projectileTex);
         player.createAnimation(sheetTex);
 
         camera.position.set(player.bounds.x, player.bounds.y, 0);
+    }
+
+    public boolean running(){
+        return !state.isWon && !state.isGameOver && !state.isPaused;
     }
 }

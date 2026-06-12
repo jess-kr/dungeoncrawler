@@ -15,10 +15,10 @@ public class AudioManager {
     private float musicVolume = 0.2f;
 
     public AudioManager() {
-        hitSound       = Gdx.audio.newSound(Gdx.files.internal("hit.wav"));
-        collectSound   = Gdx.audio.newSound(Gdx.files.internal("collect.wav"));
-        shootSound     = Gdx.audio.newSound(Gdx.files.internal("shoot.wav"));
-        backgroundMusic = Gdx.audio.newMusic(Gdx.files.internal("background.wav"));
+        hitSound       = Gdx.audio.newSound(Gdx.files.internal("audio/hit.wav"));
+        collectSound   = Gdx.audio.newSound(Gdx.files.internal("audio/collect.wav"));
+        shootSound     = Gdx.audio.newSound(Gdx.files.internal("audio/shoot.wav"));
+        backgroundMusic = Gdx.audio.newMusic(Gdx.files.internal("audio/background.wav"));
         backgroundMusic.setLooping(true);
         backgroundMusic.setVolume(musicVolume);
         backgroundMusic.play();
