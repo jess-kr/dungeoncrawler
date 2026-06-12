@@ -17,11 +17,7 @@ import com.badlogic.gdx.utils.viewport.Viewport;
 import java.util.ArrayList;
 import java.util.Iterator;
 
-/**
- * The main gameplay screen.
- * All heavy lifting is delegated to AudioManager, SpawnManager,
- * InputHandler, UIRenderer, and GameState.
- */
+
 public class GameScreen implements Screen {
 
     // -------------------------------------------------------------------------
@@ -402,3 +398,4 @@ public class GameScreen implements Screen {
         return !state.isWon && !state.isGameOver && !state.isPaused;
     }
 }
+
